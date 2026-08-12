@@ -1,9 +1,9 @@
 name: zach
 email: zachriley36@gmail.com
 enabled: true
-budget: { min: 2000, max: 3800 }          # USD/month
-locations: [Williamsburg, Bushwick, "Long Island City"]
-bedrooms: { min: 1, max: 2 }
+budget: { min: 2000, max: 4700 }          # USD/month
+locations: [Williamsburg, Bushwick, Greenpoint, "East Village"]
+bedrooms: { min: 2 }                       # 2BR or larger
 bathrooms: { min: 1 }
 move_in: { earliest: 2026-09-01, latest: 2026-10-15 }
 amenities:
@@ -11,9 +11,9 @@ amenities:
   laundry_in_building: required
   gym: preferred
   rooftop: preferred
-  ac: preferred                   # NYC AC is rarely a searchable filter
+  ac: ignore                      # de-emphasized (was 'preferred'); no provider field for AC anyway
   dishwasher: ignore
-  pets: required
+  pets: ignore                    # irrelevant
   no_fee: preferred               # broker-fee-free
 run:
   sources: [aggregator, streeteasy]
