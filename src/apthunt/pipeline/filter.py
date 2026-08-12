@@ -13,7 +13,8 @@ _ROOM_SHARE_MARKERS = (
 
 
 def _is_room_share(listing: Listing) -> bool:
-    text = (listing.description or "").lower()
+    # check title AND description — co-living operators put "Private Room" in the title
+    text = ((getattr(listing, "title", "") or "") + " " + (listing.description or "")).lower()
     return any(marker in text for marker in _ROOM_SHARE_MARKERS)
 
 

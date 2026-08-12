@@ -41,3 +41,10 @@ def test_per_room_budget_profile_grades_without_crash():
         "bathrooms": {}, "move_in": {}, "amenities": {}, "run": {}})
     g = grade_listing(_l(price=5400), _v(), p)
     assert g.grade == Grade.APPLY
+
+def test_llm_room_share_flag_is_nope():
+    # verifier flags a co-living/private-room listing -> excluded regardless of beds/amenities
+    v = VerificationResult(is_active=True, scam_risk="low", amenity_findings={},
+                           is_room_share=True, summary="Private room in a shared unit.")
+    g = grade_listing(_l(price=3000), v, _p(required=(), preferred=()))
+    assert g.grade == Grade.NOPE and "co-living" in g.rationale.lower()

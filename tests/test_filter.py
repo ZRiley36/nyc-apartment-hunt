@@ -67,6 +67,11 @@ def test_room_share_dropped_despite_reported_bedrooms():
     lst = _l(bedrooms=3, description="Stylish Private ROOM in Greenpoint, 107 Greenpoint Ave")
     assert apply_filters([lst], _profile()) == []
 
+def test_room_share_detected_in_title():
+    # co-living puts "Private ROOM" in the TITLE; description is generic
+    lst = _l(bedrooms=3, description="Bright unit near the park", title="Stylish Private ROOM in Greenpoint")
+    assert apply_filters([lst], _profile()) == []
+
 def test_whole_apartment_kept():
     lst = _l(bedrooms=2, description="Sunny 2BR apartment, renovated kitchen, near the L train")
     assert len(apply_filters([lst], _profile())) == 1

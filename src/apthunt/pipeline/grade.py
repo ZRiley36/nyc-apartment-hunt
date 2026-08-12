@@ -24,8 +24,11 @@ def grade_listing(listing, verification, profile) -> Graded:
     contradicted = [a for a in required if findings.get(a) == "contradicted"]
     unconfirmed = [a for a in required if findings.get(a) in (None, "unconfirmed")]
 
-    if verification.scam_risk == "high" or not verification.is_active or contradicted:
+    room_share = getattr(verification, "is_room_share", False)
+    if verification.scam_risk == "high" or not verification.is_active or contradicted or room_share:
         why = []
+        if room_share:
+            why.append("single room / co-living, not a whole apartment")
         if not verification.is_active:
             why.append("listing not active")
         if verification.scam_risk == "high":

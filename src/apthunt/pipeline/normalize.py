@@ -30,6 +30,7 @@ class Listing:
     amenities_raw: dict[str, bool] = field(default_factory=dict)
     photos: list[str] = field(default_factory=list)
     description: str = ""
+    title: str = ""
     is_active: bool = True
 
 
@@ -105,7 +106,7 @@ def _agg(data: dict) -> Listing | None:
         sqft=_int_or_none(_num(data.get("livingArea"))),
         available_date=_date((data.get("extras") or {}).get("availableFrom")),
         amenities_raw=amenities, photos=data.get("pictures") or [],
-        description=data.get("description") or "",
+        description=data.get("description") or "", title=data.get("title") or "",
     )
 
 
@@ -131,7 +132,7 @@ def _se(data: dict) -> Listing | None:
         price=int(price), bedrooms=_num(data.get("beds")), bathrooms=_num(data.get("baths")),
         sqft=_int_or_none(_num(data.get("sqft"))), available_date=_date(data.get("availableOn")),
         amenities_raw=amenities, photos=data.get("images", []) or [],
-        description=data.get("description", "") or "",
+        description=data.get("description", "") or "", title=data.get("title", "") or "",
     )
 
 

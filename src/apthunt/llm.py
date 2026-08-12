@@ -8,6 +8,7 @@ class VerificationResult(BaseModel):
     scam_risk: Literal["low", "medium", "high"]
     scam_reasons: list[str] = Field(default_factory=list)
     amenity_findings: dict[str, Literal["confirmed", "unconfirmed", "contradicted"]] = Field(default_factory=dict)
+    is_room_share: bool = False   # single private room / co-living, not a whole apartment
     summary: str
 
 
@@ -32,7 +33,11 @@ def build_verify_messages(listing, profile) -> list[dict]:
         "for the area, a missing or fake-looking address, or a description pushing "
         "off-platform payment or contact; (3) for EACH amenity listed below, mark confirmed "
         "/ unconfirmed (not mentioned) / contradicted (evidence it is absent), from the "
-        "description and provider flags; (4) a <=2 sentence summary. " + amenity_line + "\n\n"
+        "description and provider flags; (4) a <=2 sentence summary; (5) set is_room_share "
+        "TRUE if this is a single private room, a bedroom in a shared/co-living apartment, "
+        "or a room-by-room rental (e.g. June, Blueground, 'private room in a 3-bedroom') "
+        "rather than an entire apartment leased to one household. " + amenity_line + "\n\n"
+        f"Title: {getattr(listing, 'title', '')}\n"
         f"Address: {listing.address}\nNeighborhood: {listing.neighborhood}\n"
         f"Price: {listing.price}  Beds: {listing.bedrooms}  Baths: {listing.bathrooms}\n"
         f"Provider amenity flags: {listing.amenities_raw}\n"
