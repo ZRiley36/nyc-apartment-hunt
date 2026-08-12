@@ -1,4 +1,4 @@
-from apthunt.llm import VerificationResult
+from apthunt.llm import VerificationResult, build_verify_messages
 from apthunt.pipeline.verify import verify_listing
 from apthunt.pipeline.normalize import Listing
 from apthunt.config.schema import Profile
@@ -31,3 +31,11 @@ def test_verify_returns_parsed():
                             amenity_findings={"laundry_in_building": "confirmed"}, summary="Nice 1BR.")
     out = verify_listing(_listing(), _profile(), client=_FakeClient(vr))
     assert out.amenity_findings["laundry_in_building"] == "confirmed"
+
+def test_verify_messages_are_text_only():
+    # Listing CDNs block bot image fetch via robots.txt -> image URL blocks 400.
+    # Verification must send text only.
+    listing = _listing()  # has photos
+    blocks = build_verify_messages(listing, _profile())[0]["content"]
+    assert blocks and all(b["type"] == "text" for b in blocks)
+    assert "laundry_in_building" in blocks[0]["text"]  # amenity listed for assessment
