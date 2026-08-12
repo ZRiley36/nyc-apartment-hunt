@@ -7,9 +7,13 @@ from apthunt.pipeline.normalize import RawListing
 
 FX = Path(__file__).parent / "fixtures"
 
+class _FakeRun:
+    # mirrors apify-client 3.x Run model: dataset id is an attribute, not a dict key
+    default_dataset_id = "ds1"
+
 class _FakeActor:
     def __init__(self, items): self._items = items
-    def call(self, run_input=None): return {"defaultDatasetId": "ds1"}
+    def call(self, run_input=None): return _FakeRun()
 
 class _FakeDataset:
     def __init__(self, items): self._items = items
@@ -24,7 +28,7 @@ class _CapturingActor:
     def __init__(self, items, sink): self._items, self._sink = items, sink
     def call(self, run_input=None):
         self._sink.append(run_input)
-        return {"defaultDatasetId": "ds1"}
+        return _FakeRun()
 
 class _CapturingApify:
     def __init__(self, items):
