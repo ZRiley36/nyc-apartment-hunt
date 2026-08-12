@@ -11,8 +11,9 @@ class Amenity(str, Enum):
 
 
 class Budget(BaseModel):
-    min: int
-    max: int
+    min: int = 0
+    max: int | None = None          # whole-apartment cap; omit when using per_room_max
+    per_room_max: int | None = None # cap on rent-per-bedroom (each roommate's share)
 
 
 class RangeInt(BaseModel):
@@ -39,6 +40,7 @@ class Profile(BaseModel):
     locations: list[str]
     bedrooms: RangeInt = RangeInt()
     bathrooms: RangeInt = RangeInt()
+    min_bath_per_bed: float | None = None   # e.g. 0.5 = at least 1 bath per 2 bedrooms
     move_in: MoveIn = MoveIn()
     amenities: dict[str, Amenity] = Field(default_factory=dict)
     run: RunConfig = RunConfig()

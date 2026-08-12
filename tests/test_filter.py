@@ -41,6 +41,27 @@ def test_studio_or_unknown_bedrooms_dropped_when_min_set():
     assert apply_filters([_l(bedrooms=0)], _profile()) == []
     assert apply_filters([_l(bedrooms=None)], _profile()) == []
 
+def _share_profile():
+    return Profile.model_validate({
+        "name": "n", "email": "n@e.com", "enabled": True,
+        "budget": {"per_room_max": 2700}, "locations": ["Midtown"],
+        "bedrooms": {"min": 2}, "bathrooms": {"min": 1}, "min_bath_per_bed": 0.5,
+        "move_in": {}, "amenities": {}, "run": {}})
+
+def test_per_room_share_budget():
+    p = _share_profile()
+    # 2BR @ 5400 -> 2700/room (keep); 2BR @ 6000 -> 3000/room (drop)
+    assert len(apply_filters([_l(bedrooms=2, price=5400, neighborhood="Midtown")], p)) == 1
+    assert apply_filters([_l(bedrooms=2, price=6000, neighborhood="Midtown")], p) == []
+    # 3BR @ 8100 -> 2700/room (keep) — bigger apartment, more splitting
+    assert len(apply_filters([_l(bedrooms=3, price=8100, bathrooms=2, neighborhood="Midtown")], p)) == 1
+
+def test_bath_per_bed_ratio():
+    p = _share_profile()  # 0.5 = 1 bath per 2 beds
+    assert apply_filters([_l(bedrooms=3, bathrooms=1, price=6000, neighborhood="Midtown")], p) == []   # 3bed/1bath out
+    assert len(apply_filters([_l(bedrooms=3, bathrooms=2, price=6000, neighborhood="Midtown")], p)) == 1  # 3bed/2bath ok
+    assert len(apply_filters([_l(bedrooms=2, bathrooms=1, price=5000, neighborhood="Midtown")], p)) == 1  # 2bed/1bath ok
+
 def test_room_share_dropped_despite_reported_bedrooms():
     # co-living: reports 3 bedrooms but the description says it's a private room
     lst = _l(bedrooms=3, description="Stylish Private ROOM in Greenpoint, 107 Greenpoint Ave")

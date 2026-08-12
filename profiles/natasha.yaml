@@ -1,20 +1,17 @@
 name: natasha
-email: natasha@example.com
-enabled: false                    # parked until tailored: real email + NYC-qualified locations
-budget: { min: 2000, max: 3800 }          # USD/month
-locations: [Astoria, "Jackson Heights"]
-bedrooms: { min: 1, max: 2 }
+email: natasha@example.com        # TODO: real email before enabling (this is the alert recipient)
+enabled: false                    # TODO: set true once email + move_in are filled in
+budget:
+  per_room_max: 2700              # her share cap: total rent / bedrooms (one person per bedroom)
+locations: ["Midtown, Manhattan, NY", "Lower Manhattan, New York, NY"]  # "all midtown/downtown"
+bedrooms: { min: 2 }              # 2+ bed (needed to split rent)
 bathrooms: { min: 1 }
-move_in: { earliest: 2026-09-01, latest: 2026-10-15 }
+min_bath_per_bed: 0.5             # >=1 bath per 2 beds — excludes e.g. 3 bed / 1 bath
+move_in: {}                       # TODO: earliest / latest dates
 amenities:
-  laundry_in_unit: preferred      # in_unit | in_building | none
-  laundry_in_building: required
-  gym: preferred
-  rooftop: preferred
-  ac: preferred                   # NYC AC is rarely a searchable filter
-  dishwasher: ignore
-  pets: required
-  no_fee: preferred               # broker-fee-free
+  laundry_in_building: preferred  # her must-haves as preferred (data is sparse; required caps at Consider)
+  elevator: preferred
 run:
-  sources: [aggregator]           # StreetEasy dropped for v1
-  max_verify_per_run: 25          # hard cost cap
+  sources: [aggregator]
+  radius_miles: 2.0               # wide — she wants all of midtown/downtown, not one block
+  max_verify_per_run: 25

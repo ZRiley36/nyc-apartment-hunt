@@ -73,6 +73,7 @@ _AGG_AMENITY_MATCH = {
     "dishwasher": ("dishwasher",),
     "ac": ("air conditioning", "central air", "central a/c", "a/c"),
     "no_fee": ("no fee", "no-fee", "no broker fee"),
+    "elevator": ("elevator",),
 }
 
 

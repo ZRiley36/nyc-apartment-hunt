@@ -17,6 +17,8 @@ _CENTROIDS: dict[str, tuple[float, float]] = {
     "williamsburg": (40.7081, -73.9571),
     "greenpoint": (40.7304, -73.9510),
     "east village": (40.7265, -73.9815),
+    "midtown": (40.7549, -73.9840),          # ~Bryant Park / Times Sq
+    "lower manhattan": (40.7115, -74.0086),  # ~City Hall / FiDi ("downtown")
     "bushwick": (40.6942, -73.9212),
     "astoria": (40.7644, -73.9235),
     "jackson heights": (40.7557, -73.8831),

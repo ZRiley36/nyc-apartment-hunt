@@ -28,8 +28,17 @@ def matches(listing: Listing, profile: Profile) -> tuple[bool, list[str]]:
     reasons: list[str] = []
     if _is_room_share(listing):
         reasons.append("room-share / co-living listing (private room), not a whole unit")
-    if listing.price is not None and not (profile.budget.min <= listing.price <= profile.budget.max):
-        reasons.append(f"price {listing.price} outside {profile.budget.min}-{profile.budget.max}")
+    price = listing.price
+    if price is not None:
+        if price < profile.budget.min:
+            reasons.append(f"price {price} below floor {profile.budget.min}")
+        if profile.budget.max is not None and price > profile.budget.max:
+            reasons.append(f"price {price} above max {profile.budget.max}")
+        # per-person share = total rent / bedrooms (one person per bedroom)
+        if profile.budget.per_room_max is not None and listing.bedrooms:
+            share = price / listing.bedrooms
+            if share > profile.budget.per_room_max:
+                reasons.append(f"share ${share:.0f}/room over ${profile.budget.per_room_max}")
     # A stated bedrooms minimum must be met by a KNOWN count. Unlike price and
     # neighborhood (where unknown data is kept for the verifier to judge), an
     # unknown bedroom count does NOT satisfy a minimum: aggregator studios,
@@ -43,6 +52,11 @@ def matches(listing: Listing, profile: Profile) -> tuple[bool, list[str]]:
     if listing.bathrooms is not None and profile.bathrooms.min is not None:
         if listing.bathrooms < profile.bathrooms.min:
             reasons.append("too few bathrooms")
+    # bath-to-bedroom ratio (e.g. 0.5 = 1 bath per 2 beds; kills 3bed/1bath)
+    if profile.min_bath_per_bed is not None and listing.bedrooms and listing.bathrooms is not None:
+        need = listing.bedrooms * profile.min_bath_per_bed
+        if listing.bathrooms < need:
+            reasons.append(f"{listing.bathrooms} bath for {listing.bedrooms} bed (need {need:.1f})")
     if not _location_ok(listing, profile):
         reasons.append("neighborhood mismatch")
     if listing.available_date and profile.move_in.latest and listing.available_date > profile.move_in.latest:

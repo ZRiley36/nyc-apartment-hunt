@@ -23,6 +23,7 @@ def test_normalize_aggregator():
     assert lst.amenities_raw["gym"] is True
     assert lst.amenities_raw["ac"] is True
     assert lst.amenities_raw["dishwasher"] is False
+    assert lst.amenities_raw["elevator"] is False  # not in this fixture's amenity lists
 
 def test_normalize_aggregator_coerces_range_fields():
     # real actor returns price.value / bedrooms / bathrooms as {min,max} on some providers
