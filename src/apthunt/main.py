@@ -55,7 +55,8 @@ def run(profiles, *, dry_run, clients_for, llm_client, salt, today, site_root, s
 def _real_clients_for(profile):
     from .sources.fixtures import get_client
     token = os.environ["APIFY_TOKEN"]
-    return [get_client(name, token) for name in profile.run.sources]
+    return [get_client(name, token, radius_miles=profile.run.radius_miles)
+            for name in profile.run.sources]
 
 
 def _dry_clients_for(_profile):

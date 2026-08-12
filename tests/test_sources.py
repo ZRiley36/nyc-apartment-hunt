@@ -52,6 +52,18 @@ def test_fixture_client_filters_by_location():
     got = client.search(["Bushwick"], 2000, 4000)
     assert [r.data["url"] for r in got] == ["u1"]
 
+def test_get_client_passes_radius_to_aggregator():
+    from apthunt.sources.fixtures import get_client
+    c = get_client("aggregator", "t", radius_miles=0.75)
+    assert isinstance(c, AggregatorClient) and c.radius_miles == 0.75
+    assert get_client("aggregator", "t").radius_miles == 1.5   # default when unset
+
+def test_aggregator_respects_radius_miles():
+    fake = _CapturingApify([{"source": {"url": "u"}, "price": {"value": 3000},
+                             "address": {"formattedAddress": "1 A St"}}])
+    AggregatorClient(token="t", radius_miles=0.75, client=fake).search(["Williamsburg, Brooklyn, NY"], 2000, 4700)
+    assert fake.inputs[0]["radiusMiles"] == 0.75
+
 def test_aggregator_fans_out_per_location():
     fake = _CapturingApify([{"source": {"url": "u"}, "price": {"value": 3000},
                              "address": {"formattedAddress": "1 A St"}}])

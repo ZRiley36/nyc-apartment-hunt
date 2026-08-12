@@ -28,6 +28,7 @@ class MoveIn(BaseModel):
 class RunConfig(BaseModel):
     sources: list[str] = Field(default_factory=lambda: ["aggregator", "streeteasy"])
     max_verify_per_run: int = 25
+    radius_miles: float = 1.5   # aggregator search radius per location; lower = tighter
 
 
 class Profile(BaseModel):

@@ -2,7 +2,7 @@ name: zach
 email: zachriley36@gmail.com
 enabled: true
 budget: { min: 2000, max: 4700 }          # USD/month
-locations: ["Williamsburg, Brooklyn, NY", "Bushwick, Brooklyn, NY", "Greenpoint, Brooklyn, NY", "East Village, Manhattan, NY"]  # qualify or the actor geocodes "Williamsburg" -> VA
+locations: ["Williamsburg, Brooklyn, NY", "Greenpoint, Brooklyn, NY", "East Village, Manhattan, NY"]  # qualify or the actor geocodes "Williamsburg" -> VA
 bedrooms: { min: 2 }                       # 2BR or larger
 bathrooms: { min: 1 }
 move_in: { earliest: 2026-09-01, latest: 2026-10-15 }
@@ -18,3 +18,4 @@ amenities:
 run:
   sources: [aggregator]           # StreetEasy dropped for v1
   max_verify_per_run: 25          # hard cost cap
+  radius_miles: 0.75              # tighter than default 1.5 — stop cross-river bleed (FiDi)

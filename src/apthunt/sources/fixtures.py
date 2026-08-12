@@ -19,7 +19,10 @@ class FixtureClient:
         return listing
 
 
-def get_client(name: str, token: str):
+def get_client(name: str, token: str, radius_miles: float | None = None):
     from .aggregator import AggregatorClient
     from .streeteasy import StreetEasyClient
-    return {"aggregator": AggregatorClient, "streeteasy": StreetEasyClient}[name](token)
+    if name == "aggregator":
+        kwargs = {} if radius_miles is None else {"radius_miles": radius_miles}
+        return AggregatorClient(token, **kwargs)
+    return {"streeteasy": StreetEasyClient}[name](token)
