@@ -2,7 +2,7 @@ name: zach
 email: zachriley36@gmail.com
 enabled: true
 budget: { min: 2000, max: 4700 }          # USD/month
-locations: [Williamsburg, Bushwick, Greenpoint, "East Village"]
+locations: ["Williamsburg, Brooklyn, NY", "Bushwick, Brooklyn, NY", "Greenpoint, Brooklyn, NY", "East Village, Manhattan, NY"]  # qualify or the actor geocodes "Williamsburg" -> VA
 bedrooms: { min: 2 }                       # 2BR or larger
 bathrooms: { min: 1 }
 move_in: { earliest: 2026-09-01, latest: 2026-10-15 }
