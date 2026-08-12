@@ -1,6 +1,6 @@
 name: natasha
 email: natasha@example.com
-enabled: true
+enabled: false                    # parked until tailored: real email + NYC-qualified locations
 budget: { min: 2000, max: 3800 }          # USD/month
 locations: [Astoria, "Jackson Heights"]
 bedrooms: { min: 1, max: 2 }
