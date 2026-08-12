@@ -16,5 +16,5 @@ amenities:
   pets: ignore                    # irrelevant
   no_fee: preferred               # broker-fee-free
 run:
-  sources: [aggregator, streeteasy]
+  sources: [aggregator]           # StreetEasy dropped for v1
   max_verify_per_run: 25          # hard cost cap
