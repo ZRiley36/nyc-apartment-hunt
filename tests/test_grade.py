@@ -33,3 +33,11 @@ def test_unconfirmed_required_is_consider():
 def test_all_confirmed_is_apply():
     g = grade_listing(_l(price=2500), _v(findings={"laundry_in_building": "confirmed"}), _p())
     assert g.grade == Grade.APPLY
+
+def test_per_room_budget_profile_grades_without_crash():
+    # per-room-share profile has budget.max = None; the top-band tie-break must not crash
+    p = Profile.model_validate({"name": "n", "email": "n@e.com", "enabled": True,
+        "budget": {"per_room_max": 2700}, "locations": ["Midtown"], "bedrooms": {"min": 2},
+        "bathrooms": {}, "move_in": {}, "amenities": {}, "run": {}})
+    g = grade_listing(_l(price=5400), _v(), p)
+    assert g.grade == Grade.APPLY

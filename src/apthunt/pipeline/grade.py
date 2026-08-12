@@ -42,9 +42,11 @@ def grade_listing(listing, verification, profile) -> Graded:
         return Graded(listing, verification, Grade.CONSIDER,
                       f"Looks good but verify: {', '.join(unconfirmed)}.", score)
 
-    # all required confirmed
-    top_band = listing.price is not None and listing.price >= profile.budget.min + \
-        0.85 * (profile.budget.max - profile.budget.min)
+    # all required confirmed — "near top of whole-apartment budget" tie-break
+    # (skipped for per-room-share profiles, which have no whole-apartment max)
+    top_band = (profile.budget.max is not None and listing.price is not None
+                and listing.price >= profile.budget.min
+                + 0.85 * (profile.budget.max - profile.budget.min))
     if top_band and not confirmed_pref:
         return Graded(listing, verification, Grade.CONSIDER,
                       "Meets must-haves but near top of budget with few extras.", score)
