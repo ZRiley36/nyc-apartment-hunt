@@ -58,6 +58,30 @@ def test_get_client_passes_radius_to_aggregator():
     assert isinstance(c, AggregatorClient) and c.radius_miles == 0.75
     assert get_client("aggregator", "t").radius_miles == 1.5   # default when unset
 
+def test_aggregator_geo_filters_by_gps_distance():
+    # Williamsburg centroid ~ (40.7081, -73.9571). near = a few blocks; far = Sheepshead Bay.
+    near = {"source": {"url": "near"}, "price": {"value": 3000},
+            "address": {"formattedAddress": "near"}, "gps": {"lat": 40.7090, "lng": -73.9560}}
+    far = {"source": {"url": "far"}, "price": {"value": 3000},
+           "address": {"formattedAddress": "far"}, "gps": {"lat": 40.5900, "lng": -73.9400}}
+    fake = _CapturingApify([near, far])
+    out = AggregatorClient(token="t", radius_miles=0.75, client=fake).search(
+        ["Williamsburg, Brooklyn, NY"], 2000, 4000)
+    urls = {r.data["source"]["url"] for r in out}
+    assert "near" in urls and "far" not in urls
+
+def test_aggregator_keeps_when_geo_unjudgeable():
+    # unknown centroid OR missing gps -> cannot prove it's far -> keep
+    no_gps = {"source": {"url": "a"}, "price": {"value": 3000}, "address": {"formattedAddress": "a"}}
+    fake = _CapturingApify([no_gps])
+    assert len(AggregatorClient(token="t", radius_miles=0.75, client=fake).search(
+        ["Williamsburg, Brooklyn, NY"], 2000, 4000)) == 1          # known centroid, no gps -> kept
+    far_but_unknown_hood = {"source": {"url": "b"}, "price": {"value": 3000},
+                            "address": {"formattedAddress": "b"}, "gps": {"lat": 0.0, "lng": 0.0}}
+    fake2 = _CapturingApify([far_but_unknown_hood])
+    assert len(AggregatorClient(token="t", radius_miles=0.75, client=fake2).search(
+        ["Nowheresville, XX"], 2000, 4000)) == 1                    # no centroid -> kept
+
 def test_aggregator_respects_radius_miles():
     fake = _CapturingApify([{"source": {"url": "u"}, "price": {"value": 3000},
                              "address": {"formattedAddress": "1 A St"}}])
