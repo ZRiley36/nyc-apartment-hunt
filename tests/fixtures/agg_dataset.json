@@ -1,0 +1,10 @@
+[
+  {"url": "https://apartments.com/x/1", "formattedAddress": "123 Main St, Brooklyn, NY",
+   "neighborhood": "Bushwick", "price": 3200, "bedrooms": 1, "bathrooms": 1, "squareFootage": 650,
+   "availableDate": "2026-09-15", "photos": ["https://cdn/x1.jpg"],
+   "description": "Sunny 1BR with in-building laundry and a gym.",
+   "features": {"gym": true, "laundry": "building"}},
+  {"url": "https://apartments.com/x/2", "formattedAddress": "9 Lenox Ave, New York, NY",
+   "neighborhood": "Harlem", "price": 2800, "bedrooms": 1, "bathrooms": 1, "squareFootage": 600,
+   "availableDate": "2026-09-01", "photos": [], "description": "1BR uptown.", "features": {}}
+]
