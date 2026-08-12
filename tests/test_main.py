@@ -22,11 +22,26 @@ class _LLM:
                 amenity_findings={"laundry_in_building": "confirmed"}, summary="Nice.")
             return R()
 
+def _recs():
+    return [RawListing(r["source"], r["data"]) for r in json.loads((FX / "pipeline_records.json").read_text())]
+
 def test_run_writes_report_and_state(tmp_path):
-    recs = [RawListing(r["source"], r["data"]) for r in json.loads((FX / "pipeline_records.json").read_text())]
+    recs = _recs()
     paths = run([_profile()], dry_run=True, clients_for=lambda p: [FixtureClient(recs)],
                 llm_client=_LLM(), salt="salt1", today="2026-08-11",
                 site_root=tmp_path / "site", state_dir=tmp_path / "state")
     assert paths and paths[0].exists()
     assert "Apply now" in paths[0].read_text()
     assert (tmp_path / "state" / "zach.json").exists()
+
+def test_second_run_has_no_new_matches(tmp_path):
+    # The central promise: a listing surfaced on run 1 is not "new" on run 2.
+    from apthunt.main import PooledClient
+    PooledClient._cache.clear()
+    kw = dict(dry_run=True, clients_for=lambda p: [FixtureClient(_recs())], llm_client=_LLM(),
+              salt="salt1", today="2026-08-11", site_root=tmp_path / "site", state_dir=tmp_path / "state")
+    run([_profile()], **kw)                 # run 1: surfaces + records the match
+    paths = run([_profile()], **kw)         # run 2: same fixtures, state now has the id
+    html = paths[0].read_text()
+    assert "Apply now (0)" in html          # nothing new this run
+    assert "NEW" not in html
