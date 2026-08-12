@@ -60,4 +60,5 @@ def test_aggregator_fans_out_per_location():
     assert {ri["location"] for ri in fake.inputs} == {"Bushwick", "Greenpoint"}
     for ri in fake.inputs:
         assert ri["offerType"] == "rent" and ri["maxResults"] == 40
+        assert ri["radiusMiles"] == 1.5   # tight per-neighborhood radius
         assert "priceMin" not in ri and "priceMax" not in ri and "listingType" not in ri
