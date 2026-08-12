@@ -1,0 +1,49 @@
+name: apartment-hunt
+on:
+  schedule:
+    - cron: "0 12 * * *"   # 08:00 America/New_York (EDT)
+    - cron: "0 17 * * *"   # 13:00 America/New_York (EDT)
+  workflow_dispatch: {}
+permissions:
+  contents: write   # to commit state back
+  pages: write
+  id-token: write
+concurrency:
+  group: apartment-hunt
+  cancel-in-progress: false
+jobs:
+  hunt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -e .
+      - name: Run hunt
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          REPORT_SLUG_SALT: ${{ secrets.REPORT_SLUG_SALT }}
+          SITE_BASE_URL: ${{ vars.SITE_BASE_URL }}   # e.g. https://ZRiley36.github.io/nyc-apartment-hunt
+        run: apthunt
+      - name: Commit updated state
+        run: |
+          git config user.name "apt-hunt-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add state/
+          git diff --cached --quiet || git commit -m "chore: update seen-listing state [skip ci]"
+          git push
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: site }
+  deploy:
+    needs: hunt
+    runs-on: ubuntu-latest
+    environment: { name: github-pages, url: "${{ steps.deploy.outputs.page_url }}" }
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

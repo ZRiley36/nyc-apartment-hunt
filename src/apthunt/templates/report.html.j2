@@ -1,0 +1,39 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Apartment matches — {{ ctx.profile_name }}</title>
+<style>
+  :root{color-scheme:light dark}
+  body{font:16px/1.5 system-ui,sans-serif;margin:0;padding:1.25rem;max-width:900px;margin-inline:auto}
+  h1{font-size:1.4rem} h2{margin-top:2rem}
+  .card{border:1px solid #8884;border-radius:12px;padding:1rem;margin:1rem 0;display:flex;gap:1rem}
+  .card img{width:160px;height:120px;object-fit:cover;border-radius:8px;flex:none}
+  .badge{display:inline-block;padding:.1rem .5rem;border-radius:999px;font-size:.8rem;font-weight:600}
+  .apply{background:#1a7f4b;color:#fff}.consider{background:#b7791f;color:#fff}
+  .new{background:#2563eb;color:#fff;margin-left:.4rem}
+  .price{font-weight:700} .muted{opacity:.7;font-size:.9rem}
+  a.btn{display:inline-block;margin-top:.5rem}
+</style></head><body>
+<h1>Apartment matches — {{ ctx.profile_name }}</h1>
+<p class="muted">Generated {{ ctx.generated_at }}</p>
+{% macro card(c) %}
+  <div class="card">
+    {% if c.photo %}<img src="{{ c.photo }}" alt="listing photo">{% endif %}
+    <div>
+      <span class="badge {{ 'apply' if c.grade=='Apply now' else 'consider' }}">{{ c.grade }}</span>
+      {% if c.is_new %}<span class="badge new">NEW</span>{% endif %}
+      <div><span class="price">${{ c.price or '?' }}/mo</span>
+        · {{ c.beds }}bd/{{ c.baths }}ba · {{ c.neighborhood or 'NYC' }}</div>
+      <div>{{ c.address }}</div>
+      <div>{{ c.summary }}</div>
+      <div class="muted">{{ c.rationale }}
+        {% if c.matched_amenities %}· confirmed: {{ c.matched_amenities|join(', ') }}{% endif %}</div>
+      <a class="btn" href="{{ c.url }}" target="_blank" rel="noopener">View listing →</a>
+    </div>
+  </div>
+{% endmacro %}
+<h2>Apply now ({{ ctx.apply|length }})</h2>
+{% for c in ctx.apply %}{{ card(c) }}{% else %}<p class="muted">Nothing this run.</p>{% endfor %}
+<h2>Consider ({{ ctx.consider|length }})</h2>
+{% for c in ctx.consider %}{{ card(c) }}{% else %}<p class="muted">Nothing this run.</p>{% endfor %}
+<p class="muted">{{ ctx.nope_count }} listings filtered out as not-a-match this run.</p>
+</body></html>

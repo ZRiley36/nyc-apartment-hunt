@@ -1,0 +1,5 @@
+{"source": "streeteasy",
+ "data": {"url": "https://streeteasy.com/building/y/2", "address": "45 Bedford Ave #3, Brooklyn, NY",
+          "area": "Williamsburg", "price": 3500, "beds": 2, "baths": 1, "sqft": 800,
+          "availableOn": "2026-10-01", "images": ["https://cdn/y2.jpg"],
+          "description": "No-fee 2BR, roof deck, dishwasher.", "amenities": ["roof_deck", "dishwasher"]}}

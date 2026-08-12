@@ -1,0 +1,20 @@
+name: natasha
+email: natasha@example.com
+enabled: true
+budget: { min: 2000, max: 3800 }          # USD/month
+locations: [Astoria, "Jackson Heights"]
+bedrooms: { min: 1, max: 2 }
+bathrooms: { min: 1 }
+move_in: { earliest: 2026-09-01, latest: 2026-10-15 }
+amenities:
+  laundry_in_unit: preferred      # in_unit | in_building | none
+  laundry_in_building: required
+  gym: preferred
+  rooftop: preferred
+  ac: preferred                   # NYC AC is rarely a searchable filter
+  dishwasher: ignore
+  pets: required
+  no_fee: preferred               # broker-fee-free
+run:
+  sources: [aggregator, streeteasy]
+  max_verify_per_run: 25          # hard cost cap
