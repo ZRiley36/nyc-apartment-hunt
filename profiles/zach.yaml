@@ -8,7 +8,7 @@ bathrooms: { min: 1 }
 move_in: { earliest: 2026-09-01, latest: 2026-10-15 }
 amenities:
   laundry_in_unit: preferred      # in_unit | in_building | none
-  laundry_in_building: required
+  laundry_in_building: preferred  # aggregator rarely reports laundry as structured data
   gym: preferred
   rooftop: preferred
   ac: ignore                      # de-emphasized (was 'preferred'); no provider field for AC anyway
