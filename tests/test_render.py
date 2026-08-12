@@ -17,6 +17,17 @@ def test_render_contains_card_fields():
     assert "1 A St" in html and "Apply now" in html and "https://x/1" in html
     assert "NEW" in html and "3 listings" in html
 
+def test_render_has_sort_controls_and_sections():
+    card = Card(url="https://x/1", address="1 A St", neighborhood="Bushwick", price=3200,
+               beds=2, baths=1, grade="Apply now", rationale="r", summary="s",
+               photo=None, is_new=True, matched_amenities=["gym", "laundry_in_building"])
+    ctx = ReportContext("zach", "t", apply=[card], consider=[], nope_count=0, new_ids=[])
+    html = render_report(ctx)
+    assert 'id="sortby"' in html and 'value="price-asc"' in html and 'value="amenities"' in html
+    assert 'class="cards" data-section="apply"' in html
+    assert 'class="cards" data-section="consider"' in html
+    assert 'data-price="3200"' in html and 'data-amenities="2"' in html and 'data-beds="2"' in html
+
 def test_render_escapes_hostile_input():
     # scraper/LLM-derived fields are published to a public page — must be escaped
     card = Card(url="https://x/1", address="<script>alert(1)</script>", neighborhood="X",

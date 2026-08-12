@@ -4,8 +4,19 @@
 <style>
   :root{color-scheme:light dark}
   body{font:16px/1.5 system-ui,sans-serif;margin:0;padding:1.25rem;max-width:900px;margin-inline:auto}
-  h1{font-size:1.4rem} h2{margin-top:2rem}
-  .card{border:1px solid #8884;border-radius:12px;padding:1rem;margin:1rem 0;display:flex;gap:1rem}
+  h1{font-size:1.4rem;margin-bottom:.2rem}
+  .controls{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;
+            position:sticky;top:0;background:Canvas;padding:.6rem 0;border-bottom:1px solid #8883;z-index:1}
+  .controls label{font-size:.9rem;font-weight:600}
+  select{font:inherit;padding:.3rem .5rem;border-radius:8px;border:1px solid #8886;background:Canvas;color:CanvasText}
+  section{margin-top:1.5rem}
+  section h2{display:flex;align-items:center;gap:.5rem;font-size:1.15rem;
+             padding-left:.6rem;border-left:5px solid #8884}
+  section.sec-apply h2{border-left-color:#1a7f4b}
+  section.sec-consider h2{border-left-color:#b7791f}
+  .count{font-size:.85rem;font-weight:600;opacity:.75}
+  .cards{display:flex;flex-direction:column}
+  .card{border:1px solid #8884;border-radius:12px;padding:1rem;margin:.6rem 0;display:flex;gap:1rem}
   .card img{width:160px;height:120px;object-fit:cover;border-radius:8px;flex:none}
   .badge{display:inline-block;padding:.1rem .5rem;border-radius:999px;font-size:.8rem;font-weight:600}
   .apply{background:#1a7f4b;color:#fff}.consider{background:#b7791f;color:#fff}
@@ -15,8 +26,24 @@
 </style></head><body>
 <h1>Apartment matches — {{ ctx.profile_name }}</h1>
 <p class="muted">Generated {{ ctx.generated_at }}</p>
-{% macro card(c) %}
-  <div class="card">
+
+<div class="controls">
+  <label for="sortby">Sort by</label>
+  <select id="sortby">
+    <option value="recommended">Recommended</option>
+    <option value="price-asc">Price: low → high</option>
+    <option value="price-desc">Price: high → low</option>
+    <option value="amenities">Most amenities</option>
+    <option value="beds">Most bedrooms</option>
+    <option value="hood">Neighborhood A–Z</option>
+    <option value="newest">Newest first</option>
+  </select>
+</div>
+
+{% macro card(c, idx) %}
+  <article class="card" data-order="{{ idx }}" data-price="{{ c.price or 0 }}"
+           data-amenities="{{ c.matched_amenities|length }}" data-beds="{{ c.beds or 0 }}"
+           data-new="{{ 1 if c.is_new else 0 }}" data-hood="{{ c.neighborhood or '' }}">
     {% if c.photo %}<img src="{{ c.photo }}" alt="listing photo">{% endif %}
     <div>
       <span class="badge {{ 'apply' if c.grade=='Apply now' else 'consider' }}">{{ c.grade }}</span>
@@ -29,11 +56,46 @@
         {% if c.matched_amenities %}· confirmed: {{ c.matched_amenities|join(', ') }}{% endif %}</div>
       <a class="btn" href="{{ c.url }}" target="_blank" rel="noopener">View listing →</a>
     </div>
-  </div>
+  </article>
 {% endmacro %}
-<h2>Apply now ({{ ctx.apply|length }})</h2>
-{% for c in ctx.apply %}{{ card(c) }}{% else %}<p class="muted">Nothing this run.</p>{% endfor %}
-<h2>Consider ({{ ctx.consider|length }})</h2>
-{% for c in ctx.consider %}{{ card(c) }}{% else %}<p class="muted">Nothing this run.</p>{% endfor %}
+
+<section class="sec-apply">
+  <h2>Apply now <span class="count">({{ ctx.apply|length }})</span></h2>
+  <div class="cards" data-section="apply">
+    {% for c in ctx.apply %}{{ card(c, loop.index0) }}{% else %}<p class="muted">Nothing this run.</p>{% endfor %}
+  </div>
+</section>
+
+<section class="sec-consider">
+  <h2>Consider <span class="count">({{ ctx.consider|length }})</span></h2>
+  <div class="cards" data-section="consider">
+    {% for c in ctx.consider %}{{ card(c, loop.index0) }}{% else %}<p class="muted">Nothing this run.</p>{% endfor %}
+  </div>
+</section>
+
 <p class="muted">{{ ctx.nope_count }} listings filtered out as not-a-match this run.</p>
+
+<script>
+(function () {
+  var sel = document.getElementById("sortby");
+  function num(el, a) { return parseFloat(el.getAttribute(a)) || 0; }
+  var cmp = {
+    recommended: function (a, b) { return num(a, "data-order") - num(b, "data-order"); },
+    "price-asc": function (a, b) { return num(a, "data-price") - num(b, "data-price"); },
+    "price-desc": function (a, b) { return num(b, "data-price") - num(a, "data-price"); },
+    amenities: function (a, b) { return num(b, "data-amenities") - num(a, "data-amenities"); },
+    beds: function (a, b) { return num(b, "data-beds") - num(a, "data-beds"); },
+    newest: function (a, b) { return (num(b, "data-new") - num(a, "data-new")) || (num(a, "data-order") - num(b, "data-order")); },
+    hood: function (a, b) { return (a.getAttribute("data-hood") || "").localeCompare(b.getAttribute("data-hood") || ""); }
+  };
+  function applySort() {
+    var fn = cmp[sel.value] || cmp.recommended;
+    document.querySelectorAll(".cards").forEach(function (box) {
+      Array.prototype.slice.call(box.querySelectorAll(".card")).sort(fn)
+        .forEach(function (c) { box.appendChild(c); });
+    });
+  }
+  sel.addEventListener("change", applySort);
+})();
+</script>
 </body></html>

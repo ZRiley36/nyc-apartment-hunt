@@ -43,5 +43,5 @@ def test_second_run_has_no_new_matches(tmp_path):
     run([_profile()], **kw)                 # run 1: surfaces + records the match
     paths = run([_profile()], **kw)         # run 2: same fixtures, state now has the id
     html = paths[0].read_text()
-    assert "Apply now (0)" in html          # nothing new this run
-    assert "NEW" not in html
+    assert html.count("Nothing this run.") == 2   # both Apply and Consider empty
+    assert "NEW" not in html                       # no new-listing badges rendered
