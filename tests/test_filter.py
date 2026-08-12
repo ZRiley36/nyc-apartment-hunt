@@ -35,3 +35,15 @@ def test_required_amenity_absent_still_kept():
     lst = _l()
     lst.amenities_raw = {"laundry_in_building": False}
     assert len(apply_filters([lst], _profile())) == 1
+
+def test_studio_or_unknown_bedrooms_dropped_when_min_set():
+    # min is 1 in _profile(): a studio (0) and an unstated count must both drop
+    assert apply_filters([_l(bedrooms=0)], _profile()) == []
+    assert apply_filters([_l(bedrooms=None)], _profile()) == []
+
+def test_unknown_bedrooms_kept_when_no_min():
+    p = Profile.model_validate({
+        "name": "z", "email": "z@e.com", "enabled": True,
+        "budget": {"min": 2000, "max": 3800}, "locations": ["Bushwick"],
+        "bedrooms": {}, "bathrooms": {}, "move_in": {}, "amenities": {}, "run": {}})
+    assert len(apply_filters([_l(bedrooms=None)], p)) == 1
