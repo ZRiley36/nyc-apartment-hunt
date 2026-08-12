@@ -1,0 +1,6 @@
+{"source": "aggregator",
+ "data": {"url": "https://apartments.com/x/1", "formattedAddress": "123 Main St, Brooklyn, NY",
+          "neighborhood": "Bushwick", "price": 3200, "bedrooms": 1, "bathrooms": 1, "squareFootage": 650,
+          "availableDate": "2026-09-15", "photos": ["https://cdn/x1.jpg"],
+          "description": "Sunny 1BR with in-building laundry and a gym.",
+          "features": {"gym": true, "laundry": "building"}}}
