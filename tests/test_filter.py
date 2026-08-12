@@ -41,6 +41,15 @@ def test_studio_or_unknown_bedrooms_dropped_when_min_set():
     assert apply_filters([_l(bedrooms=0)], _profile()) == []
     assert apply_filters([_l(bedrooms=None)], _profile()) == []
 
+def test_room_share_dropped_despite_reported_bedrooms():
+    # co-living: reports 3 bedrooms but the description says it's a private room
+    lst = _l(bedrooms=3, description="Stylish Private ROOM in Greenpoint, 107 Greenpoint Ave")
+    assert apply_filters([lst], _profile()) == []
+
+def test_whole_apartment_kept():
+    lst = _l(bedrooms=2, description="Sunny 2BR apartment, renovated kitchen, near the L train")
+    assert len(apply_filters([lst], _profile())) == 1
+
 def test_unknown_bedrooms_kept_when_no_min():
     p = Profile.model_validate({
         "name": "z", "email": "z@e.com", "enabled": True,

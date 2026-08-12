@@ -2,6 +2,20 @@ from __future__ import annotations
 from .normalize import Listing
 from ..config.schema import Profile
 
+# Co-living operators (June, Blueground, etc.) list a single private room but
+# report it as a multi-bedroom "apartment", so the bedroom filter misses them.
+# Their descriptions give it away. Verified against real data: these phrases hit
+# only room-shares, never a whole in-budget apartment.
+_ROOM_SHARE_MARKERS = (
+    "private room", "private bedroom", "room for rent", "rooms for rent",
+    "co-living", "coliving", "furnished room", "room in a", "shared apartment",
+)
+
+
+def _is_room_share(listing: Listing) -> bool:
+    text = (listing.description or "").lower()
+    return any(marker in text for marker in _ROOM_SHARE_MARKERS)
+
 
 def _location_ok(listing: Listing, profile: Profile) -> bool:
     if not listing.neighborhood:
@@ -12,6 +26,8 @@ def _location_ok(listing: Listing, profile: Profile) -> bool:
 
 def matches(listing: Listing, profile: Profile) -> tuple[bool, list[str]]:
     reasons: list[str] = []
+    if _is_room_share(listing):
+        reasons.append("room-share / co-living listing (private room), not a whole unit")
     if listing.price is not None and not (profile.budget.min <= listing.price <= profile.budget.max):
         reasons.append(f"price {listing.price} outside {profile.budget.min}-{profile.budget.max}")
     # A stated bedrooms minimum must be met by a KNOWN count. Unlike price and
